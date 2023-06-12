@@ -7,7 +7,7 @@ replicaCount: 1
 ##
 image:
   repository: apache/nifi
-  tag: "1.16.3"
+  tag: "1.19.0"
   pullPolicy: "IfNotPresent"
 
   ## Optionally specify an imagePullSecret.
@@ -406,7 +406,7 @@ zookeeper:
   ## If the Zookeeper Chart is disabled a URL and port are required to connect
   url: ""
   port: 2181
-  replicaCount: 3
+  replicaCount: 1
 
 # ------------------------------------------------------------------------------
 # Nifi registry:
@@ -423,12 +423,12 @@ registry:
 metrics:
   prometheus:
     # Enable Prometheus metrics
-    enabled: false
+    enabled: true
     # Port used to expose Prometheus metrics
     port: 9092
     serviceMonitor:
       # Enable deployment of Prometheus Operator ServiceMonitor resource
-      enabled: false
+      enabled: true
       # namespace: monitoring
       # Additional labels for the ServiceMonitor
       labels: {}
