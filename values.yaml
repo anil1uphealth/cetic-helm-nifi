@@ -1,14 +1,17 @@
 ---
 # Number of nifi nodes
-replicaCount: 1
+replicaCount: 3
 
 ## Set default image, imageTag, and imagePullPolicy.
 ## ref: https://hub.docker.com/r/apache/nifi/
 ##
 image:
-  repository: apache/nifi
-  tag: "1.19.0"
-  pullPolicy: "IfNotPresent"
+  repository: 597539975382.dkr.ecr.us-east-1.amazonaws.com/1up-nifi
+  tag: "latest"
+  pullPolicy: "Always"
+#  repository: apache/nifi
+#  tag: "1.19.1"
+#  pullPolicy: "Always"
 
   ## Optionally specify an imagePullSecret.
   ## Secret must be manually created in the namespace.
@@ -90,7 +93,7 @@ properties:
   algorithm: NIFI_PBKDF2_AES_GCM_256
   # use externalSecure for when inbound SSL is provided by nginx-ingress or other external mechanism
   externalSecure: false
-  isNode: false
+  isNode: true
   httpsPort: 8443
   webProxyHost: # <clusterIP>:<NodePort> (If Nifi service is NodePort or LoadBalancer)
   clusterPort: 6007
@@ -239,7 +242,7 @@ sidecar:
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
 ##
 persistence:
-  enabled: false
+  enabled: true
 
   # When creating persistent storage, the NiFi helm chart can either reference an already-defined
   # storage class by name, such as "standard" or can define a custom storage class by specifying
@@ -255,21 +258,21 @@ persistence:
   accessModes:  [ReadWriteOnce]
   ## Storage Capacities for persistent volumes
   configStorage:
-    size: 100Mi
+    size: 512Mi
   authconfStorage:
-    size: 100Mi
+    size: 512Mi
   # Storage capacity for the 'data' directory, which is used to hold things such as the flow.xml.gz, configuration, state, etc.
   dataStorage:
-    size: 1Gi
+    size: 150Gi
   # Storage capacity for the FlowFile repository
   flowfileRepoStorage:
-    size: 10Gi
+    size: 100Gi
   # Storage capacity for the Content repository
   contentRepoStorage:
-    size: 10Gi
+    size: 150Gi
   # Storage capacity for the Provenance repository. When changing this, one should also change the properties.provenanceStorage value above, also.
   provenanceRepoStorage:
-    size: 10Gi
+    size: 150Gi
   # Storage capacity for nifi logs
   logStorage:
     size: 5Gi
@@ -277,7 +280,14 @@ persistence:
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: {}
+resources: 
+  requests:
+    cpu: 1000m
+    memory: 2048Mi
+  limits:
+    cpu: 2000m
+    memory: 4096Mi
+
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -370,7 +380,7 @@ ca:
 # Setting this true will have cert-manager create a private CA for the cluster
 # as well as the certificates for each cluster node.
 certManager:
-  enabled: false
+  enabled: true
   clusterDomain: cluster.local
   keystorePasswd: changeme
   truststorePasswd: changeme
@@ -404,9 +414,9 @@ zookeeper:
   ## ref: https://github.com/bitnami/charts/blob/master/bitnami/zookeeper/values.yaml
   enabled: true
   ## If the Zookeeper Chart is disabled a URL and port are required to connect
-  url: ""
+  url: "nifi-zookeeper"
   port: 2181
-  replicaCount: 1
+  replicaCount: 3
 
 # ------------------------------------------------------------------------------
 # Nifi registry:
